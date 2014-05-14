@@ -193,6 +193,8 @@
 			this._actors_height  = 0;
 			this._signals_height = 0;
 
+                        this._id = 0;
+
 			var a = this.arrow_types = {};
 			a[ARROWTYPE.FILLED] = 'block';
 			a[ARROWTYPE.OPEN]   = 'open';
@@ -208,8 +210,13 @@
 
 		init_font : function() {},
 
-		draw_line : function(x1, y1, x2, y2) {
-			return this._paper.line(x1, y1, x2, y2);
+		draw_line : function(x1, y1, x2, y2, id) {
+			var obj = this._paper.line(x1, y1, x2, y2);
+                        if (typeof id !== 'undefined') {
+                            obj.node.setAttribute('data-line', id);
+                        }
+                        console.log(obj);
+                        return obj;
 		},
 
 		draw_rect : function(x, y, w, h) {
@@ -456,13 +463,16 @@
 
 			// Draw three lines, the last one with a arrow
 			var line;
-			line = this.draw_line(aX, y1, aX + SELF_SIGNAL_WIDTH, y1);
+			line = this.draw_line(aX, y1, aX + SELF_SIGNAL_WIDTH, y1, this._id);
 			line.attr(attr);
 
-			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y1, aX + SELF_SIGNAL_WIDTH, y2);
+			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y1, aX + SELF_SIGNAL_WIDTH, y2, this._id);
 			line.attr(attr);
 
-			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y2, aX, y2);
+			line = this.draw_line(aX + SELF_SIGNAL_WIDTH, y2, aX, y2, this._id);
+                        
+                        this._id++;
+                        
 			attr['arrow-end'] = this.arrow_types[signal.arrowtype] + '-wide-long';
 			line.attr(attr);
 		},
@@ -480,7 +490,8 @@
 
 			// Draw the line along the bottom of the signal
 			y = offsetY + signal.height - SIGNAL_MARGIN - SIGNAL_PADDING;
-			var line = this.draw_line(aX, y, bX, y);
+			var line = this.draw_line(aX, y, bX, y, this._id);
+                        this._id++;
 			line.attr(LINE);
 			line.attr({
 				'arrow-end': this.arrow_types[signal.arrowtype] + '-wide-long',
